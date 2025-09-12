@@ -24,7 +24,8 @@ public class ShoppingListController {
         return ResponseEntity.ok(shoppingList);
     }
 
-    @GetMapping("/all")
+
+    @GetMapping
     public ResponseEntity<List<ShoppingList>> findAllShoppingLists() {
         List<ShoppingList> shoppingLists = this.shoppingListService.findAll();
         return shoppingLists.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingLists);

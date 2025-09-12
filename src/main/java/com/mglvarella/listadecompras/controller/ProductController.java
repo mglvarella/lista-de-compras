@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
 
@@ -18,18 +18,18 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequestDTO body){
         Product newProduct = this.productService.createProduct(body);
         return ResponseEntity.ok(newProduct);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<String> deleteProductByIds(@RequestBody List<Long> ids){
         return productService.deleteProduct(ids) ? ResponseEntity.ok().body("Successfully deleted") : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody ProductRequestDTO body){
         try{
             Product product = productService.updateById(id, body);
@@ -45,11 +45,9 @@ public class ProductController {
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/all") 
+    @GetMapping
     public ResponseEntity<List<Product>> findAllProducts(){
         List<Product> products = this.productService.findAll();
         return products.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(products);
     }
-
-
 }
