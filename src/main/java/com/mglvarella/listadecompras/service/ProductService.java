@@ -27,7 +27,7 @@ public class ProductService {
         return newProduct;
     }
 
-    public Product updateProductById(Long id, ProductRequestDTO data){
+    public Product updateById(Long id, ProductRequestDTO data){
         Optional<Product> product = productRepository.findById(id);
 
         if(product.isEmpty()){
@@ -55,7 +55,7 @@ public class ProductService {
         return true;
     }
 
-    public Optional<Product> findProductById(Long id){
+    public Optional<Product> findById(Long id){
         return productRepository.findById(id);
     }
 
