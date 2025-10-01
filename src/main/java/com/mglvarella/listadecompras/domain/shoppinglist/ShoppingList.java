@@ -22,17 +22,25 @@ public class ShoppingList {
 
     private LocalDate creationDate;
 
+    private String description;
+
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShoppingListItem> items;
 
-    public ShoppingList() {}
+    public ShoppingList(String listName, String description) {
+        this.listName = listName;
+        this.setCreationDate(LocalDate.now());
+    }
+
+    public ShoppingList() {
+    }
 
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getListName() { return listName; }
-    public void setListName(String listName) { this.listName = listName; }
+    private void setId(Long id) { this.id = id; }
+    public String getName() { return listName; }
+    public void setName(String listName) { this.listName = listName; }
     public LocalDate getCreationDate() { return creationDate; }
-    public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
+    private void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
     public List<ShoppingListItem> getItems() { return items; }
     public void setItems(List<ShoppingListItem> items) { this.items = items; }
 

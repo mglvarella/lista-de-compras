@@ -3,11 +3,14 @@ package com.mglvarella.listadecompras.controller;
 import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.product.ProductRequestDTO;
 import com.mglvarella.listadecompras.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/products")
@@ -19,21 +22,22 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductRequestDTO body){
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequestDTO body){
         Product newProduct = this.productService.createProduct(body);
-        return ResponseEntity.ok(newProduct);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newProduct.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @DeleteMapping
     public ResponseEntity<String> deleteProductByIds(@RequestBody List<Long> ids){
-        return productService.deleteProduct(ids) ? ResponseEntity.ok().body("Successfully deleted") : ResponseEntity.notFound().build();
+        return productService.deleteProducts(ids) ? ResponseEntity.ok().body("Successfully deleted") : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody ProductRequestDTO body){
+    public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody @Valid ProductRequestDTO body){
         try{
-            Product product = productService.updateById(id, body);
-            return ResponseEntity.ok(product);
+            return ResponseEntity.ok(this.productService.updateProduct(id, body));
         }catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

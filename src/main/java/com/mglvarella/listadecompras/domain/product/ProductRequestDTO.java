@@ -1,4 +1,10 @@
 package com.mglvarella.listadecompras.domain.product;
+import jakarta.validation.constraints.NotBlank;
 
-public record ProductRequestDTO(String name, String description) {
+public record ProductRequestDTO(
+        @NotBlank(message = "O produto deve ter um nome")
+        String name,
+        @NotBlank(message = "O produto deve ter uma descrição")
+        String description) {
+
 }

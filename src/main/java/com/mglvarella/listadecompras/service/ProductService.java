@@ -27,26 +27,26 @@ public class ProductService {
         return newProduct;
     }
 
-    public Product updateById(Long id, ProductRequestDTO data){
-        Optional<Product> product = productRepository.findById(id);
+    public Product updateProduct(Long id, ProductRequestDTO data){
+        Optional<Product> productOptional = productRepository.findById(id);
 
-        if(product.isEmpty()){
-            throw new RuntimeException("product not found");
+        if(productOptional.isEmpty()){
+            throw new RuntimeException("productOptional not found");
         }
 
         if(data.name() != null){
-            product.get().setName(data.name());
+            productOptional.get().setName(data.name());
         }
 
         if(data.description() != null){
-            product.get().setDescription(data.description());
+            productOptional.get().setDescription(data.description());
         }
 
-        productRepository.save(product.get());
-        return product.get();
+        productRepository.save(productOptional.get());
+        return productOptional.get();
     }
 
-    public boolean deleteProduct(List<Long> ids){
+    public boolean deleteProducts(List<Long> ids){
         if(ids.isEmpty())
             return false;
         for(Long id : ids){
