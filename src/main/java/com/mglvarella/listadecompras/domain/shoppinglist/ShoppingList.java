@@ -1,5 +1,7 @@
 package com.mglvarella.listadecompras.domain.shoppinglist;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,23 +14,25 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@JsonPropertyOrder({ "id", "name", "creationDate", "items" })
 public class ShoppingList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String listName;
+    private String name;
 
     private LocalDate creationDate;
 
     private String description;
 
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ShoppingListItem> items;
 
     public ShoppingList(String listName, String description) {
-        this.listName = listName;
+        this.name = listName;
         this.setCreationDate(LocalDate.now());
     }
 
@@ -37,8 +41,8 @@ public class ShoppingList {
 
     public Long getId() { return id; }
     private void setId(Long id) { this.id = id; }
-    public String getName() { return listName; }
-    public void setName(String listName) { this.listName = listName; }
+    public String getName() { return name; }
+    public void setName(String listName) { this.name = listName; }
     public LocalDate getCreationDate() { return creationDate; }
     private void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
     public List<ShoppingListItem> getItems() { return items; }
