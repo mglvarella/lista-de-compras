@@ -1,11 +1,10 @@
 package com.mglvarella.listadecompras.controller;
 
-import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
-import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemRequestDTO;
-import com.mglvarella.listadecompras.repositories.ShoppingListItemRepository;
+import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemCreateDTO;
+import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemUpdateDTO;
 import com.mglvarella.listadecompras.service.ShoppingListItemService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +15,33 @@ import java.util.List;
 @RequestMapping("/shopping-lists")
 public class ShoppingListItemController {
 
-    private ShoppingListItemService shoppingListItemService;
+    private final ShoppingListItemService shoppingListItemService;
     public ShoppingListItemController(ShoppingListItemService shoppingListItemService) {
         this.shoppingListItemService = shoppingListItemService;
     }
 
     @PostMapping("/{listId}/items")
-    public ResponseEntity<ShoppingList> addItem(
+    public ResponseEntity<List<ShoppingListItem>> addItems(
             @PathVariable Long listId,
-            @RequestBody List<ShoppingListItemRequestDTO> dto) {
-
-        ShoppingList shoppingList = shoppingListItemService.addItemsToList(listId, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(shoppingList);
+            @Valid @RequestBody List<ShoppingListItemCreateDTO> items
+    ) {
+        List<ShoppingListItem> createdItems = shoppingListItemService.addItemsToList(listId, items);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdItems);
     }
+
+    @PutMapping("/{listId}/items/{itemId}")
+    public ResponseEntity<ShoppingListItem> updateItem(@PathVariable Long listId, @PathVariable Long itemId, @RequestBody ShoppingListItemUpdateDTO dto) {
+        ShoppingListItem updatedItem = shoppingListItemService.updateItem(listId, itemId, dto);
+        return ResponseEntity.ok(updatedItem);
+    }
+
+    @PatchMapping("/{listId}/items/{itemId}/purchased")
+    public ResponseEntity<ShoppingListItem> markAsPurchased(
+            @PathVariable Long listId,
+            @PathVariable Long itemId
+    ) {
+        ShoppingListItem updatedItem = shoppingListItemService.markItemAsPurchased(listId, itemId);
+        return ResponseEntity.ok(updatedItem);
+    }
+
 }

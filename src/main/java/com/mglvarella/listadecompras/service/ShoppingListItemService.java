@@ -3,7 +3,8 @@ package com.mglvarella.listadecompras.service;
 import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
-import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemRequestDTO;
+import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemCreateDTO;
+import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemUpdateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
 import com.mglvarella.listadecompras.repositories.ShoppingListItemRepository;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
@@ -36,7 +37,7 @@ public class ShoppingListItemService {
     }
 
     @Transactional
-    public ShoppingList addItemsToList(Long listId, List<ShoppingListItemRequestDTO> items) {
+    public List<ShoppingListItem> addItemsToList(Long listId, List<ShoppingListItemCreateDTO> items) {
         if (items == null || items.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A lista de itens não pode ser vazia");
         }
@@ -44,7 +45,7 @@ public class ShoppingListItemService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encontrada"));
 
         List<Long> productIds = items.stream()
-                .map(ShoppingListItemRequestDTO::itemId)
+                .map(ShoppingListItemCreateDTO::productId)
                 .distinct()
                 .toList();
 
@@ -64,14 +65,41 @@ public class ShoppingListItemService {
         List<ShoppingListItem> newItems = items.stream()
                 .map(dto -> new ShoppingListItem(
                         shoppingList,
-                        productMap.get(dto.itemId()),
+                        productMap.get(dto.productId()),
                         dto.quantity(),
                         dto.itemPrice()
                 ))
                 .toList();
 
         shoppingList.getItems().addAll(newItems);
-        return shoppingList;
+        return newItems;
 
     }
+
+    @Transactional
+    public ShoppingListItem updateItem(Long listId, Long itemId, ShoppingListItemUpdateDTO dto) {
+        ShoppingList shoppingList = shoppingListRepository.findById(listId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encontrada"));
+
+        ShoppingListItem shoppingListItem = shoppingListItemRepository.findByIdAndShoppingListId(itemId, listId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado"));
+
+        shoppingListItem.setQuantity(dto.quantity());
+        shoppingListItem.setPrice(dto.itemPrice());
+
+        return shoppingListItem;
+    }
+
+    @Transactional
+    public ShoppingListItem markItemAsPurchased(Long listId, Long itemId) {
+        ShoppingListItem item = shoppingListItemRepository
+                .findByIdAndShoppingListId(itemId, listId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado nesta lista"));
+
+        item.setPurchased(true);
+        return item;
+    }
+
+
+
 }
