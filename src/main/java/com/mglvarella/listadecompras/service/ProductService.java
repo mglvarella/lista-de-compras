@@ -4,9 +4,11 @@ import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.product.ProductRequestDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -28,22 +30,19 @@ public class ProductService {
     }
 
     public Product updateProduct(Long id, ProductRequestDTO data){
-        Optional<Product> productOptional = productRepository.findById(id);
-
-        if(productOptional.isEmpty()){
-            throw new RuntimeException("productOptional not found");
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
 
         if(data.name() != null){
-            productOptional.get().setName(data.name());
+            product.setName(data.name());
         }
 
         if(data.description() != null){
-            productOptional.get().setDescription(data.description());
+            product.setDescription(data.description());
         }
 
-        productRepository.save(productOptional.get());
-        return productOptional.get();
+        productRepository.save(product);
+        return product;
     }
 
     public boolean deleteProducts(List<Long> ids){
@@ -55,8 +54,8 @@ public class ProductService {
         return true;
     }
 
-    public Optional<Product> findById(Long id){
-        return productRepository.findById(id);
+    public Product findById(Long id){
+        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não econtrado"));
     }
 
     public List<Product> findAll(){

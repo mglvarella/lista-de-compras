@@ -4,10 +4,11 @@ import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListRequestDTO;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ShoppingListService {
@@ -27,20 +28,18 @@ public class ShoppingListService {
     }
 
     public ShoppingList updateShoppingList(Long id, ShoppingListRequestDTO shoppingListDTO) {
-        Optional<ShoppingList> shoppingListOptional = shoppingListRepository.findById(id);
-        if (shoppingListOptional.isEmpty()) {
-            throw new RuntimeException("ShoppingList with id " + id + " not found");
-        }
+        ShoppingList shoppingList = shoppingListRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encntrada"));
 
         if(shoppingListDTO.name() != null){
-            shoppingListOptional.get().setName(shoppingListDTO.name());
+            shoppingList.setName(shoppingListDTO.name());
         }
         if(shoppingListDTO.description() != null){
-            shoppingListOptional.get().setName(shoppingListDTO.description());
+            shoppingList.setName(shoppingListDTO.description());
         }
 
-        shoppingListRepository.save(shoppingListOptional.get());
-        return shoppingListOptional.get();
+        shoppingListRepository.save(shoppingList);
+        return shoppingList;
     }
 
     public List<ShoppingList> findAll() {
@@ -48,7 +47,9 @@ public class ShoppingListService {
 
     }
 
-    public Optional<ShoppingList> findById(Long id) {
-        return shoppingListRepository.findById(id);
+    public ShoppingList findById(Long id) {
+
+        return shoppingListRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não econtrado"));
     }
 }

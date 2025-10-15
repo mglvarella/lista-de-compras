@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
-import java.util.Optional;
 import java.net.URI;
 
 @RestController
@@ -46,7 +45,7 @@ public class ShoppingListController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingList> findShoppingListById(@PathVariable("id") Long id) {
-        Optional<ShoppingList> product = this.shoppingListService.findById(id);
-        return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+       ShoppingList product = this.shoppingListService.findById(id);
+        return ResponseEntity.ok(product);
     }
 }
