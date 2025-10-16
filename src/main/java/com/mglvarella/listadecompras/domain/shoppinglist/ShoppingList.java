@@ -1,7 +1,5 @@
 package com.mglvarella.listadecompras.domain.shoppinglist;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@JsonPropertyOrder({ "id", "name", "creationDate", "items" })
 public class ShoppingList {
 
     @Id
@@ -28,7 +25,6 @@ public class ShoppingList {
     private String description;
 
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<ShoppingListItem> items;
 
     public ShoppingList(String listName, String description) {

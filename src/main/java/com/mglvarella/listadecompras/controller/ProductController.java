@@ -1,7 +1,8 @@
 package com.mglvarella.listadecompras.controller;
 
 import com.mglvarella.listadecompras.domain.product.Product;
-import com.mglvarella.listadecompras.domain.product.ProductRequestDTO;
+import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
+import com.mglvarella.listadecompras.domain.product.ProductUpdateDTO;
 import com.mglvarella.listadecompras.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequestDTO body){
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductCreateDTO body){
         Product newProduct = this.productService.createProduct(body);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newProduct.getId()).toUri();
@@ -29,17 +30,14 @@ public class ProductController {
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteProductByIds(@RequestBody List<Long> ids){
-        return productService.deleteProducts(ids) ? ResponseEntity.ok().body("Successfully deleted") : ResponseEntity.notFound().build();
+    public ResponseEntity<String> deleteProductById(@RequestBody Long id){
+        return productService.deleteProduct(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody @Valid ProductRequestDTO body){
-        try{
-            return ResponseEntity.ok(this.productService.updateProduct(id, body));
-        }catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody ProductUpdateDTO body){
+        Product product = this.productService.updateProduct(id, body);
+        return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
     }
 
     @GetMapping("/{id}")

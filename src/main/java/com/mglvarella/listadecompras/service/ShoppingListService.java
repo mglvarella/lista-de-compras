@@ -1,12 +1,11 @@
 package com.mglvarella.listadecompras.service;
 
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
-import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListRequestDTO;
+import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListCreateDTO;
+import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListUpdateDto;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class ShoppingListService {
         this.shoppingListRepository = shoppingListRepository;
     }
 
-    public ShoppingList createShoppingList(ShoppingListRequestDTO shoppingListDTO) {
+    public ShoppingList createShoppingList(ShoppingListCreateDTO shoppingListDTO) {
         ShoppingList newShoppingList = new ShoppingList(shoppingListDTO.name(), shoppingListDTO.description());
 
         shoppingListRepository.save(newShoppingList);
@@ -27,13 +26,18 @@ public class ShoppingListService {
         return newShoppingList;
     }
 
-    public ShoppingList updateShoppingList(Long id, ShoppingListRequestDTO shoppingListDTO) {
+    public ShoppingList updateShoppingList(Long id, ShoppingListUpdateDto shoppingListDTO) {
         ShoppingList shoppingList = shoppingListRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encntrada"));
+                .orElse(null);
+
+        if (shoppingList == null) {
+            return null;
+        }
 
         if(shoppingListDTO.name() != null){
             shoppingList.setName(shoppingListDTO.name());
         }
+
         if(shoppingListDTO.description() != null){
             shoppingList.setName(shoppingListDTO.description());
         }
@@ -44,12 +48,10 @@ public class ShoppingListService {
 
     public List<ShoppingList> findAll() {
         return shoppingListRepository.findAll();
-
     }
 
     public ShoppingList findById(Long id) {
-
         return shoppingListRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não econtrado"));
+                .orElse(null);
     }
 }

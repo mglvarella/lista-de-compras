@@ -1,12 +1,11 @@
 package com.mglvarella.listadecompras.service;
 
 import com.mglvarella.listadecompras.domain.product.Product;
-import com.mglvarella.listadecompras.domain.product.ProductRequestDTO;
+import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
+import com.mglvarella.listadecompras.domain.product.ProductUpdateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Product createProduct(ProductRequestDTO data){
+    public Product createProduct(ProductCreateDTO data){
         Product newProduct = new Product();
         newProduct.setName(data.name());
         newProduct.setDescription(data.description());
@@ -29,9 +28,13 @@ public class ProductService {
         return newProduct;
     }
 
-    public Product updateProduct(Long id, ProductRequestDTO data){
+    public Product updateProduct(Long id, ProductUpdateDTO data){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
+                .orElse(null);
+
+        if (product == null) {
+            return null;
+        }
 
         if(data.name() != null){
             product.setName(data.name());
@@ -45,17 +48,21 @@ public class ProductService {
         return product;
     }
 
-    public boolean deleteProducts(List<Long> ids){
-        if(ids.isEmpty())
+    public boolean deleteProduct(Long id){
+        Product productToDelete = productRepository.findById(id)
+                .orElse(null);
+
+        if (productToDelete == null) {
             return false;
-        for(Long id : ids){
-            productRepository.deleteById(id);
         }
+
+        productRepository.deleteById(id);
         return true;
     }
 
     public Product findById(Long id){
-        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não econtrado"));
+        return productRepository.findById(id)
+                .orElse(null);
     }
 
     public List<Product> findAll(){

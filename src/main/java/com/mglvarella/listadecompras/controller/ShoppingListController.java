@@ -1,7 +1,8 @@
 package com.mglvarella.listadecompras.controller;
 
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
-import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListRequestDTO;
+import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListCreateDTO;
+import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListUpdateDto;
 import com.mglvarella.listadecompras.service.ShoppingListService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ShoppingListController {
     }
 
     @PostMapping
-    public ResponseEntity<ShoppingList> createShoppingList(@RequestBody @Valid ShoppingListRequestDTO data) {
+    public ResponseEntity<ShoppingList> createShoppingList(@RequestBody @Valid ShoppingListCreateDTO data) {
         ShoppingList shoppingList = this.shoppingListService.createShoppingList(data);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(shoppingList.getId()).toUri();
@@ -29,12 +30,9 @@ public class ShoppingListController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ShoppingList> updateShoppingList(@PathVariable Long id, @RequestBody @Valid ShoppingListRequestDTO data) {
-        try{
-            return ResponseEntity.ok(this.shoppingListService.updateShoppingList(id, data));
-        }catch (Exception e){
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ShoppingList> updateShoppingList(@PathVariable Long id, @RequestBody @Valid ShoppingListUpdateDto data) {
+        ShoppingList shoppingList = this.shoppingListService.updateShoppingList(id, data);
+        return shoppingList == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingList);
     }
 
     @GetMapping
@@ -45,7 +43,7 @@ public class ShoppingListController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingList> findShoppingListById(@PathVariable("id") Long id) {
-       ShoppingList product = this.shoppingListService.findById(id);
-        return ResponseEntity.ok(product);
+       ShoppingList shoppingList = this.shoppingListService.findById(id);
+        return shoppingList == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingList);
     }
 }
