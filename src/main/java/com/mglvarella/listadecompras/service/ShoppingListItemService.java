@@ -6,13 +6,10 @@ import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemCreateDTO;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemUpdateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
-import com.mglvarella.listadecompras.repositories.ShoppingListItemRepository;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -21,17 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class ShoppingListItemService {
 
-    private final ShoppingListItemRepository shoppingListItemRepository;
     private final ShoppingListRepository shoppingListRepository;
     private final ProductRepository productRepository;
 
     @Autowired
     public ShoppingListItemService(
-            ShoppingListItemRepository shoppingListItemRepository,
             ShoppingListRepository shoppingListRepository,
             ProductRepository productRepository
     ) {
-        this.shoppingListItemRepository = shoppingListItemRepository;
         this.shoppingListRepository = shoppingListRepository;
         this.productRepository = productRepository;
     }
@@ -39,10 +33,15 @@ public class ShoppingListItemService {
     @Transactional
     public List<ShoppingListItem> addItemsToList(Long listId, List<ShoppingListItemCreateDTO> items) {
         if (items == null || items.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A lista de itens não pode ser vazia");
+            return null;
         }
+
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encontrada"));
+                .orElse(null);
+
+        if (shoppingList == null) {
+            return null;
+        }
 
         List<Long> productIds = items.stream()
                 .map(ShoppingListItemCreateDTO::productId)
@@ -56,7 +55,7 @@ public class ShoppingListItemService {
             List<Long> missing = productIds.stream()
                     .filter(id -> !foundIds.contains(id))
                     .toList();
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produtos não encontrados: " + missing);
+            return null;
         }
 
         Map<Long, Product> productMap = products.stream()
@@ -79,27 +78,38 @@ public class ShoppingListItemService {
     @Transactional
     public ShoppingListItem updateItem(Long listId, Long itemId, ShoppingListItemUpdateDTO dto) {
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista não encontrada"));
+                .orElse(null);
+        if (shoppingList == null) {
+            return null;
+        }
 
-        ShoppingListItem shoppingListItem = shoppingListItemRepository.findByIdAndShoppingListId(itemId, listId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado"));
+        List<ShoppingListItem> items = shoppingList.getItems();
 
-        shoppingListItem.setQuantity(dto.quantity());
-        shoppingListItem.setPrice(dto.itemPrice());
+        if (items == null || items.isEmpty()) {
+            return null;
+        }
 
-        return shoppingListItem;
+        ShoppingListItem itemToUpdate = items.stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElse(null);
+
+        if (itemToUpdate == null) {
+            return null;
+        }
+
+        if (dto.quantity() != null && !dto.quantity().equals(itemToUpdate.getQuantity())) {
+            itemToUpdate.setQuantity(dto.quantity());
+        }
+
+        if (dto.itemPrice() != null && !dto.itemPrice().equals(itemToUpdate.getPrice())) {
+            itemToUpdate.setPrice(dto.itemPrice());
+        }
+
+        if(dto.purchased() != null && itemToUpdate.isPurchased() != dto.purchased()) {
+            itemToUpdate.setPurchased(dto.purchased());
+        }
+
+        return itemToUpdate;
     }
-
-    @Transactional
-    public ShoppingListItem markItemAsPurchased(Long listId, Long itemId) {
-        ShoppingListItem item = shoppingListItemRepository
-                .findByIdAndShoppingListId(itemId, listId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado nesta lista"));
-
-        item.setPurchased(true);
-        return item;
-    }
-
-
-
 }

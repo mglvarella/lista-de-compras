@@ -32,16 +32,6 @@ public class ShoppingListItemController {
     @PutMapping("/{listId}/items/{itemId}")
     public ResponseEntity<ShoppingListItem> updateItem(@PathVariable Long listId, @PathVariable Long itemId, @RequestBody ShoppingListItemUpdateDTO dto) {
         ShoppingListItem updatedItem = shoppingListItemService.updateItem(listId, itemId, dto);
-        return ResponseEntity.ok(updatedItem);
+        return updatedItem == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updatedItem);
     }
-
-    @PatchMapping("/{listId}/items/{itemId}/purchased")
-    public ResponseEntity<ShoppingListItem> markAsPurchased(
-            @PathVariable Long listId,
-            @PathVariable Long itemId
-    ) {
-        ShoppingListItem updatedItem = shoppingListItemService.markItemAsPurchased(listId, itemId);
-        return ResponseEntity.ok(updatedItem);
-    }
-
 }
