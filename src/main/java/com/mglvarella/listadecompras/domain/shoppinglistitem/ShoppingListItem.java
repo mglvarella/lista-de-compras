@@ -1,5 +1,6 @@
 package com.mglvarella.listadecompras.domain.shoppinglistitem;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ public class ShoppingListItem {
 
     @ManyToOne
     @JoinColumn(name = "shopping_list_id")
+    @JsonBackReference
     private ShoppingList shoppingList;
 
     @ManyToOne
@@ -28,12 +30,30 @@ public class ShoppingListItem {
 
     private BigDecimal price;
 
-    private Integer quantity;
+    private Long quantity;
 
     private boolean purchased;
 
     public ShoppingListItem() {
     }
+
+    public ShoppingListItem(Long id, ShoppingList shoppingList, Product product, Long quantity, BigDecimal price, boolean purchased) {
+        this.id = id;
+        this.shoppingList = shoppingList;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+        this.purchased = purchased;
+    }
+
+    public ShoppingListItem(ShoppingList shoppingList, Product product, Long quantity, BigDecimal price) {
+        this.shoppingList = shoppingList;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+        this.purchased = false;
+    }
+
 
     public Long getId() {
         return id;
@@ -67,11 +87,11 @@ public class ShoppingListItem {
         this.price = price;
     }
 
-    public Integer getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 

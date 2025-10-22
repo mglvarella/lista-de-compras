@@ -1,12 +1,13 @@
 package com.mglvarella.listadecompras.service;
 
 import com.mglvarella.listadecompras.domain.product.Product;
-import com.mglvarella.listadecompras.domain.product.ProductRequestDTO;
+import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
+import com.mglvarella.listadecompras.domain.product.ProductUpdateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -17,7 +18,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Product createProduct(ProductRequestDTO data){
+    public Product createProduct(ProductCreateDTO data){
         Product newProduct = new Product();
         newProduct.setName(data.name());
         newProduct.setDescription(data.description());
@@ -27,36 +28,41 @@ public class ProductService {
         return newProduct;
     }
 
-    public Product updateById(Long id, ProductRequestDTO data){
-        Optional<Product> product = productRepository.findById(id);
+    public Product updateProduct(Long id, ProductUpdateDTO data){
+        Product product = productRepository.findById(id)
+                .orElse(null);
 
-        if(product.isEmpty()){
-            throw new RuntimeException("product not found");
+        if (product == null) {
+            return null;
         }
 
         if(data.name() != null){
-            product.get().setName(data.name());
+            product.setName(data.name());
         }
 
         if(data.description() != null){
-            product.get().setDescription(data.description());
+            product.setDescription(data.description());
         }
 
-        productRepository.save(product.get());
-        return product.get();
+        productRepository.save(product);
+        return product;
     }
 
-    public boolean deleteProduct(List<Long> ids){
-        if(ids.isEmpty())
+    public boolean deleteProduct(Long id){
+        Product productToDelete = productRepository.findById(id)
+                .orElse(null);
+
+        if (productToDelete == null) {
             return false;
-        for(Long id : ids){
-            productRepository.deleteById(id);
         }
+
+        productRepository.deleteById(id);
         return true;
     }
 
-    public Optional<Product> findById(Long id){
-        return productRepository.findById(id);
+    public Product findById(Long id){
+        return productRepository.findById(id)
+                .orElse(null);
     }
 
     public List<Product> findAll(){
