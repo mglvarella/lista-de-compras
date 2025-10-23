@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.util.List;
 import java.net.URI;
 
@@ -29,8 +28,8 @@ public class ProductController {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> deleteProductById(@RequestBody Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Product> deleteProductById(@PathVariable("id") Long id){
         return productService.deleteProduct(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
