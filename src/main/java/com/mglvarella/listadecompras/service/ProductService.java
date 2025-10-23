@@ -23,9 +23,7 @@ public class ProductService {
         newProduct.setName(data.name());
         newProduct.setDescription(data.description());
 
-        productRepository.save(newProduct);
-
-        return newProduct;
+        return productRepository.save(newProduct);
     }
 
     public Product updateProduct(Long id, ProductUpdateDTO data){
