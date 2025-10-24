@@ -110,7 +110,22 @@ Before running this project, ensure you have the following installed:
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+#### You can run the project using Docker:
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/mglvarella/lista-de-compras
+   ```
+2. Build the Docker container
+   ```sh
+   docker build -t lista-de-compras .
+   ```
+3. Run the container
+   ```sh
+   sudo docker run -p 8080:8080 lista-de-compras
+   ```
+   
+#### Or, if you prefer, you can install the dependencies by following these steps:
 
 1. Clone the repo
    ```sh

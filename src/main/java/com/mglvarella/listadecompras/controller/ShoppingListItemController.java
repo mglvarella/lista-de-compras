@@ -26,7 +26,7 @@ public class ShoppingListItemController {
             @Valid @RequestBody List<ShoppingListItemCreateDTO> items
     ) {
         List<ShoppingListItem> createdItems = shoppingListItemService.addItemsToList(listId, items);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdItems);
+        return createdItems == null ? ResponseEntity.notFound().build() : ResponseEntity.status(HttpStatus.CREATED).body(createdItems);
     }
 
     @PutMapping("/{listId}/items/{itemId}")
