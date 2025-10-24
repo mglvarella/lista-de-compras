@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,5 +54,53 @@ public class ProductServiceTests {
 
         assertNull(result);
         verify(productRepository, times(1)).findById(2L);
+    }
+
+    @Test
+    public void shouldFindAllProducts() {
+        List<Product> products = new ArrayList<>();
+        products.add(new Product(1L, "Test Product", "Test Product find all id 1"));
+        products.add(new Product(2L, "Test Product", "Test Product find all id 2"));
+
+        when(productRepository.findAll()).thenReturn(products);
+
+        assertEquals(products, productService.findAll());
+        verify(productRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void shouldNotFindAnyProducts() {
+        List<Product> products = new ArrayList<>();
+
+        when(productRepository.findAll()).thenReturn(products);
+
+        assertEquals(products, productService.findAll());
+        verify(productRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void shouldDeleteProduct() {
+        Long id = 1L;
+
+        when(productRepository.existsById(id)).thenReturn(true);
+        doNothing().when(productRepository).deleteById(id);
+
+        boolean result = productService.deleteProduct(id);
+
+        verify(productRepository, times(1)).deleteById(id);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void shouldNotDeleteProductThatNotExists() {
+        Long id = 1L;
+
+        when(productRepository.existsById(id)).thenReturn(false);
+
+        boolean result = productService.deleteProduct(id);
+
+        assertFalse(result);
+        verify(productRepository, times(1)).existsById(id);
     }
 }

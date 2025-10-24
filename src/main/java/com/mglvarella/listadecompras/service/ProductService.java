@@ -47,13 +47,9 @@ public class ProductService {
     }
 
     public boolean deleteProduct(Long id){
-        Product productToDelete = productRepository.findById(id)
-                .orElse(null);
-
-        if (productToDelete == null) {
+        if (!productRepository.existsById(id)) {
             return false;
         }
-
         productRepository.deleteById(id);
         return true;
     }
