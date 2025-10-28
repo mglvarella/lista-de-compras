@@ -3,7 +3,6 @@ package com.mglvarella.listadecompras.service;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListCreateDTO;
 import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingListUpdateDto;
-import com.mglvarella.listadecompras.repositories.ProductRepository;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +13,9 @@ import java.util.List;
 public class ShoppingListService {
 
     private final ShoppingListRepository shoppingListRepository;
-    private final ProductRepository productRepository;
-
     @Autowired
-    public ShoppingListService(ShoppingListRepository shoppingListRepository, ProductRepository productRepository) {
+    public ShoppingListService(ShoppingListRepository shoppingListRepository) {
         this.shoppingListRepository = shoppingListRepository;
-        this.productRepository = productRepository;
     }
 
     public ShoppingList createShoppingList(ShoppingListCreateDTO shoppingListDTO) {
@@ -48,18 +44,6 @@ public class ShoppingListService {
 
         shoppingListRepository.save(shoppingList);
         return shoppingList;
-    }
-
-    public boolean deleteShoppingList (Long id){
-        ShoppingList shoppingListToDelete = shoppingListRepository.findById(id)
-                .orElse(null);
-
-        if(shoppingListToDelete == null){
-            return false;
-        }
-
-        productRepository.deleteById(id);
-        return true;
     }
 
     public List<ShoppingList> findAll() {

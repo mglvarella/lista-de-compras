@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Product> deleteProductById(@RequestBody Long id){
+    public ResponseEntity<String> deleteProductById(@RequestBody Long id){
         return productService.deleteProduct(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
@@ -49,6 +49,6 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> findAllProducts(){
         List<Product> products = this.productService.findAll();
-        return ResponseEntity.ok(products);
+        return products.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(products);
     }
 }
