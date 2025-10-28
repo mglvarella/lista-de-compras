@@ -49,6 +49,6 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> findAllProducts(){
         List<Product> products = this.productService.findAll();
-        return products.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(products);
+        return ResponseEntity.ok(products);
     }
 }

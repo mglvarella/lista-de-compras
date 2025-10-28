@@ -35,6 +35,11 @@ public class ShoppingListController {
         return shoppingList == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingList);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> updateShoppingList(@PathVariable Long id){
+        return shoppingListService.deleteShoppingList(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<ShoppingList>> findAllShoppingLists() {
         List<ShoppingList> shoppingLists = this.shoppingListService.findAll();

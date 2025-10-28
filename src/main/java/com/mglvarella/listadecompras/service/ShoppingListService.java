@@ -46,6 +46,18 @@ public class ShoppingListService {
         return shoppingList;
     }
 
+    public boolean deleteShoppingList(Long id){
+        ShoppingList shoppingListToDelete = shoppingListRepository.findById(id)
+                .orElse(null);
+
+        if (shoppingListToDelete == null){
+            return false;
+        }
+
+        shoppingListRepository.deleteById(id);
+        return true;
+    }
+
     public List<ShoppingList> findAll() {
         return shoppingListRepository.findAll();
     }
