@@ -29,26 +29,27 @@ public class ProductController {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> deleteProductById(@RequestBody Long id){
-        return productService.deleteProduct(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProductById(@PathVariable("id")  Long id){
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody ProductUpdateDTO body){
         Product product = this.productService.updateProduct(id, body);
-        return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> findProductById(@PathVariable("id") Long id){
         Product product = this.productService.findById(id);
-        return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping
     public ResponseEntity<List<Product>> findAllProducts(){
         List<Product> products = this.productService.findAll();
-        return products.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(products);
+        return ResponseEntity.ok(products);
     }
 }
