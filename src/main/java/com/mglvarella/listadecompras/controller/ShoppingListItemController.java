@@ -36,7 +36,7 @@ public class ShoppingListItemController {
     }
 
     @DeleteMapping("/{listId}/items/{itemId}")
-    public ResponseEntity<String> deleteItemFromList(@PathVariable Long listId, @PathVariable Long itemId){
+    public ResponseEntity<Void> deleteItemFromList(@PathVariable Long listId, @PathVariable Long itemId){
         shoppingListItemService.removeItem(listId, itemId);
         return ResponseEntity.noContent().build();
     }

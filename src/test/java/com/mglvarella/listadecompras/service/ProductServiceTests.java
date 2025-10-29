@@ -3,6 +3,7 @@ package com.mglvarella.listadecompras.service;
 import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,7 +53,7 @@ public class ProductServiceTests {
 
         Product result = productService.findById(2L);
 
-        assertNull(result);
+        assertThrows(EntityNotFoundException.class, () -> productService.findById(2L));
         verify(productRepository, times(1)).findById(2L);
     }
 
@@ -85,11 +86,10 @@ public class ProductServiceTests {
         when(productRepository.existsById(id)).thenReturn(true);
         doNothing().when(productRepository).deleteById(id);
 
-        boolean result = productService.deleteProduct(id);
+        assertDoesNotThrow(() -> productService.deleteProduct(id));
 
         verify(productRepository, times(1)).deleteById(id);
-
-        assertTrue(result);
+        verify(productRepository, times(1)).existsById(id);
     }
 
     @Test
@@ -98,9 +98,9 @@ public class ProductServiceTests {
 
         when(productRepository.existsById(id)).thenReturn(false);
 
-        boolean result = productService.deleteProduct(id);
+        assertThrows(EntityNotFoundException.class, () -> productService.deleteProduct(id));
 
-        assertFalse(result);
         verify(productRepository, times(1)).existsById(id);
+        verify(productRepository, never()).deleteById(id);
     }
 }

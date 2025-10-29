@@ -36,7 +36,7 @@ public class ShoppingListController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> updateShoppingList(@PathVariable Long id){
+    public ResponseEntity<Void> updateShoppingList(@PathVariable Long id){
         shoppingListService.deleteShoppingList(id);
         return ResponseEntity.noContent().build();
     }

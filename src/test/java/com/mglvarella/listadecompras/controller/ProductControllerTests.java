@@ -3,6 +3,7 @@ package com.mglvarella.listadecompras.controller;
 import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
 import com.mglvarella.listadecompras.service.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -54,9 +55,9 @@ public class ProductControllerTests {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        when(productService.deleteProduct(1L)).thenReturn(true);
+        doNothing().when(productService).deleteProduct(1L);
 
-        ResponseEntity<Product> response = productController.deleteProductById(1L);
+        ResponseEntity<Void> response = productController.deleteProductById(1L);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(productService, times(1)).deleteProduct(1L);
@@ -64,14 +65,19 @@ public class ProductControllerTests {
 
     @Test
     void shouldNotDeleteProduct() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        doThrow(new EntityNotFoundException("Product not found with id: 1"))
+                .when(productService).deleteProduct(1L);
 
-        when(productService.deleteProduct(1L)).thenReturn(false);
+        // act
+        ResponseEntity<Void> response = null;
+        try {
+            response = productController.deleteProductById(1L);
+            fail("Expected EntityNotFoundException to be thrown");
+        } catch (EntityNotFoundException ex) {
+            // assert
+            assertEquals("Product not found with id: 1", ex.getMessage());
+        }
 
-        ResponseEntity<Product> response = productController.deleteProductById(1L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(productService, times(1)).deleteProduct(1L);
     }
 
