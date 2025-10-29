@@ -32,24 +32,23 @@ public class ShoppingListItemController {
     @PutMapping("/{listId}/items/{itemId}")
     public ResponseEntity<ShoppingListItem> updateItem(@PathVariable Long listId, @PathVariable Long itemId, @RequestBody ShoppingListItemUpdateDTO dto) {
         ShoppingListItem updatedItem = shoppingListItemService.updateItem(listId, itemId, dto);
-        return updatedItem == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updatedItem);
+        return ResponseEntity.ok(updatedItem);
     }
 
-    @PutMapping("/{listId}/items/{itemId}")
+    @DeleteMapping("/{listId}/items/{itemId}")
     public ResponseEntity<String> deleteItemFromList(@PathVariable Long listId, @PathVariable Long itemId){
-        return shoppingListItemService.removeItem(listId, itemId) ? ResponseEntity.noContent().build() : ResponseEntity.ok().build();
+        shoppingListItemService.removeItem(listId, itemId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{listId}/items/")
-    public ResponseEntity<List<ShoppingListItem>> findAll(@PathVariable Long listId){
+    public ResponseEntity<List<ShoppingListItem>> findAllItems(@PathVariable Long listId){
         return ResponseEntity.ok(shoppingListItemService.findAllItems(listId));
     }
 
     @GetMapping("/{listId}/items/{itemId}")
     public ResponseEntity<ShoppingListItem> findById (@PathVariable Long listId, @PathVariable Long itemId){
         ShoppingListItem shoppingListItem = shoppingListItemService.findItem(listId, itemId);
-
-        return shoppingListItem == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingListItem);
+        return ResponseEntity.ok(shoppingListItem);
     }
-
 }

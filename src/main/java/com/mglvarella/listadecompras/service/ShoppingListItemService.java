@@ -5,8 +5,10 @@ import com.mglvarella.listadecompras.domain.shoppinglist.ShoppingList;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItem;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemCreateDTO;
 import com.mglvarella.listadecompras.domain.shoppinglistitem.ShoppingListItemUpdateDTO;
+import com.mglvarella.listadecompras.exceptions.BadRequestException;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
 import com.mglvarella.listadecompras.repositories.ShoppingListRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,15 +35,11 @@ public class ShoppingListItemService {
     @Transactional
     public List<ShoppingListItem> addItemsToList(Long listId, List<ShoppingListItemCreateDTO> items) {
         if (items == null || items.isEmpty()) {
-            return null;
+            throw new BadRequestException("You need to add at least one item");
         }
 
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElse(null);
-
-        if (shoppingList == null) {
-            return null;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("ShoppingList not found: " + listId));
 
         List<Long> productIds = items.stream()
                 .map(ShoppingListItemCreateDTO::productId)
@@ -55,7 +53,7 @@ public class ShoppingListItemService {
             List<Long> missing = productIds.stream()
                     .filter(id -> !foundIds.contains(id))
                     .toList();
-            return null;
+            throw new EntityNotFoundException("Could not find all the products sent: " + missing);
         }
 
         Map<Long, Product> productMap = products.stream()
@@ -78,25 +76,18 @@ public class ShoppingListItemService {
     @Transactional
     public ShoppingListItem updateItem(Long listId, Long itemId, ShoppingListItemUpdateDTO dto) {
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElse(null);
-        if (shoppingList == null) {
-            return null;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("ShoppingList not found: " + listId));
 
         List<ShoppingListItem> items = shoppingList.getItems();
 
         if (items == null || items.isEmpty()) {
-            return null;
+            throw new EntityNotFoundException("The shoppingList is empty");
         }
 
         ShoppingListItem itemToUpdate = items.stream()
                 .filter(item -> item.getId().equals(itemId))
                 .findFirst()
-                .orElse(null);
-
-        if (itemToUpdate == null) {
-            return null;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + itemId));
 
         if (dto.quantity() != null && !dto.quantity().equals(itemToUpdate.getQuantity())) {
             itemToUpdate.setQuantity(dto.quantity());
@@ -114,42 +105,28 @@ public class ShoppingListItemService {
     }
 
     @Transactional
-    public boolean removeItem(Long listId, Long itemId) {
+    public void removeItem(Long listId, Long itemId) {
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElse(null);
-
-        if(shoppingList == null){
-            return false;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("ShoppingList not found: " + listId));
 
         ShoppingListItem itemToRemove = shoppingList.getItems().stream()
                 .filter(item -> item.getId().equals(itemId))
                 .findFirst()
-                .orElse(null);
-
-        if(itemToRemove == null){
-            return false;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + itemId + "in the shoppingList: " + listId));
 
         shoppingList.getItems().remove(itemToRemove);
-
-        return true;
     }
 
     public List<ShoppingListItem> findAllItems(Long listId){
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElse(null);
-
-        if(shoppingList == null){
-            return null;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("ShoppingList not found: " + listId));
 
         return shoppingList.getItems();
     }
 
     public ShoppingListItem findItem(Long listId, Long itemId){
         ShoppingList shoppingList = shoppingListRepository.findById(listId)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("ShoppingList not found: " + listId));
 
         if(shoppingList == null){
             return null;
@@ -158,7 +135,8 @@ public class ShoppingListItemService {
         ShoppingListItem shoppingListItem = shoppingList.getItems().stream()
                 .filter(item -> item.getId().equals(itemId))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + itemId + "in the shoppingList: " + listId));
+
         return shoppingListItem;
     }
 }

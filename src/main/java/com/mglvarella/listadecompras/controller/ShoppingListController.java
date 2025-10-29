@@ -32,23 +32,24 @@ public class ShoppingListController {
     @PutMapping("/{id}")
     public ResponseEntity<ShoppingList> updateShoppingList(@PathVariable Long id, @RequestBody @Valid ShoppingListUpdateDto data) {
         ShoppingList shoppingList = this.shoppingListService.updateShoppingList(id, data);
-        return shoppingList == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingList);
+        return ResponseEntity.ok(shoppingList);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> updateShoppingList(@PathVariable Long id){
-        return shoppingListService.deleteShoppingList(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        shoppingListService.deleteShoppingList(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<ShoppingList>> findAllShoppingLists() {
         List<ShoppingList> shoppingLists = this.shoppingListService.findAll();
-        return shoppingLists.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingLists);
+        return ResponseEntity.ok(shoppingLists);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingList> findShoppingListById(@PathVariable("id") Long id) {
        ShoppingList shoppingList = this.shoppingListService.findById(id);
-        return shoppingList == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(shoppingList);
+        return ResponseEntity.ok(shoppingList);
     }
 }
