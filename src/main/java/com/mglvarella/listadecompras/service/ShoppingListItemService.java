@@ -112,4 +112,53 @@ public class ShoppingListItemService {
 
         return itemToUpdate;
     }
+
+    @Transactional
+    public boolean removeItem(Long listId, Long itemId) {
+        ShoppingList shoppingList = shoppingListRepository.findById(listId)
+                .orElse(null);
+
+        if(shoppingList == null){
+            return false;
+        }
+
+        ShoppingListItem itemToRemove = shoppingList.getItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElse(null);
+
+        if(itemToRemove == null){
+            return false;
+        }
+
+        shoppingList.getItems().remove(itemToRemove);
+
+        return true;
+    }
+
+    public List<ShoppingListItem> findAllItems(Long listId){
+        ShoppingList shoppingList = shoppingListRepository.findById(listId)
+                .orElse(null);
+
+        if(shoppingList == null){
+            return null;
+        }
+
+        return shoppingList.getItems();
+    }
+
+    public ShoppingListItem findItem(Long listId, Long itemId){
+        ShoppingList shoppingList = shoppingListRepository.findById(listId)
+                .orElse(null);
+
+        if(shoppingList == null){
+            return null;
+        }
+
+        ShoppingListItem shoppingListItem = shoppingList.getItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElse(null);
+        return shoppingListItem;
+    }
 }
