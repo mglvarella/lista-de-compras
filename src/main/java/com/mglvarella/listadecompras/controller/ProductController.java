@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.util.List;
 import java.net.URI;
 
@@ -29,25 +30,26 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Product> deleteProductById(@PathVariable("id") Long id){
-        return productService.deleteProduct(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<String> deleteProductById(@PathVariable("id")  Long id){
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProductById(@PathVariable("id") Long id, @RequestBody ProductUpdateDTO body){
         Product product = this.productService.updateProduct(id, body);
-        return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> findProductById(@PathVariable("id") Long id){
         Product product = this.productService.findById(id);
-        return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(product);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping
     public ResponseEntity<List<Product>> findAllProducts(){
         List<Product> products = this.productService.findAll();
-        return products.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(products);
+        return ResponseEntity.ok(products);
     }
 }

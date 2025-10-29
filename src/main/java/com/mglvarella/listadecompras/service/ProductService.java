@@ -4,6 +4,7 @@ import com.mglvarella.listadecompras.domain.product.Product;
 import com.mglvarella.listadecompras.domain.product.ProductCreateDTO;
 import com.mglvarella.listadecompras.domain.product.ProductUpdateDTO;
 import com.mglvarella.listadecompras.repositories.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +24,14 @@ public class ProductService {
         newProduct.setName(data.name());
         newProduct.setDescription(data.description());
 
-        return productRepository.save(newProduct);
+        productRepository.save(newProduct);
+
+        return newProduct;
     }
 
     public Product updateProduct(Long id, ProductUpdateDTO data){
         Product product = productRepository.findById(id)
-                .orElse(null);
-
-        if (product == null) {
-            return null;
-        }
+                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + id));
 
         if(data.name() != null){
             product.setName(data.name());
@@ -46,17 +45,16 @@ public class ProductService {
         return product;
     }
 
-    public boolean deleteProduct(Long id){
-        if (!productRepository.existsById(id)) {
-            return false;
-        }
+    public void deleteProduct(Long id){
+        Product productToDelete = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + id));
+
         productRepository.deleteById(id);
-        return true;
     }
 
     public Product findById(Long id){
         return productRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + id));
     }
 
     public List<Product> findAll(){
